@@ -30,19 +30,16 @@ public class ClientEcho {
     }
 
     @OnMessage
-    public void onMessage(String message){
+    public void onMessage(ByteBuffer message){
         try {
-            System.out.println("From server : " + message);
-            //System.out.println("From server : ");
-            // Save the received file to disk
-            //byte[] data = new byte[message.remaining()];
-            //message.get(data);
-
-            // Save to a file (e.g., received_file.pdf)
-            //try (FileOutputStream fos = new FileOutputStream("received_file.txt")) {
-            //    fos.write(data);
-            //    System.out.println("File saved as received_file.pdf.");
-            //}
+            //Save the received file to disk
+            byte[] data = new byte[message.remaining()];
+            message.get(data);
+            //Save to a file (e.g., received_file.pdf)
+            try (FileOutputStream fos = new FileOutputStream("received_file.txt")) {
+                fos.write(data);
+                System.out.println("File saved as received_file.txt");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
