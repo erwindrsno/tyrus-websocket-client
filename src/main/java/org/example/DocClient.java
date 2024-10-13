@@ -12,12 +12,17 @@ import java.net.SocketException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.concurrent.CountDownLatch;
 
 public class DocClient{
     public static void main(String[] args) throws Exception{
+        CountDownLatch latch = new CountDownLatch(1);
         ClientManager client = ClientManager.createClient();
-        while(true){
-            client.connectToServer(ClientEcho.class, new URI("ws://192.168.0.106:8025/websockets/echo"));
+        try{
+            client.connectToServer(ClientEcho.class, new URI("ws://localhost:8025/websockets/echo"));
+            latch.await();
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 }
