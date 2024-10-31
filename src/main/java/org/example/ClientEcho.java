@@ -21,9 +21,9 @@ public class ClientEcho {
     @OnOpen
     public void onOpen(Session session){
         try {
-            InetAddress me = InetAddress.getLocalHost();
-            String dottedSquad = me.getHostAddress();
-            session.getBasicRemote().sendText(dottedSquad);
+//            InetAddress me = InetAddress.getLocalHost();
+//            String dottedSquad = me.getHostAddress();
+//            session.getBasicRemote().sendText(dottedSquad);
             fos = new FileOutputStream(sourcePath.toFile());
         } catch (Exception e){
             e.printStackTrace();
@@ -33,11 +33,10 @@ public class ClientEcho {
     @OnMessage
     public void onMessage(ByteBuffer message, boolean isLast){
         try {
-            int idx = 1;
-            String strIdx = idx + "";
+//            int idx = 1;
             //Save the received file to disk
             byte[] data = new byte[message.remaining()];
-            System.out.println("Received : " + strIdx + " " + message.remaining());
+//            System.out.println("Received : " + strIdx + " " + message.remaining());
             message.get(data);
 
             fos.write(data);
