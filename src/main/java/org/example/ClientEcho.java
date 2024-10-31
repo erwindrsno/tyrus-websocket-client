@@ -24,10 +24,6 @@ public class ClientEcho {
             InetAddress me = InetAddress.getLocalHost();
             String dottedSquad = me.getHostAddress();
             session.getBasicRemote().sendText(dottedSquad);
-            //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            //System.out.println("Type yes to receive file from server");
-            //String command = reader.readLine();
-            //session.getBasicRemote().sendText(command);
             fos = new FileOutputStream(sourcePath.toFile());
         } catch (Exception e){
             e.printStackTrace();
@@ -41,14 +37,13 @@ public class ClientEcho {
             String strIdx = idx + "";
             //Save the received file to disk
             byte[] data = new byte[message.remaining()];
-            System.out.println("Remaining : " + strIdx + " " + message.remaining());
+            System.out.println("Received : " + strIdx + " " + message.remaining());
             message.get(data);
-            //Save to a file (e.g., received_file.pdf)
 
             fos.write(data);
 
             if(isLast){
-                System.out.println("File transferred!");
+                System.out.println("File received!");
                 fos.close();
             }
         } catch (Exception e) {
@@ -68,6 +63,6 @@ public class ClientEcho {
 
     @OnClose
     public void onClose(){
-        System.out.println("Connection closed by client");
+        System.out.println("Connection closed");
     }
 }
