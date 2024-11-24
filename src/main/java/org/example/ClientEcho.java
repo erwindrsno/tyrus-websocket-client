@@ -14,16 +14,25 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import org.slf4j.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @ClientEndpoint
 public class ClientEcho {
     Path sourcePath = Paths.get("toBeReceived");
     FileOutputStream fos;
+    IAcl aclSetter;
+    Session session;
+    static Logger logger = LoggerFactory.getLogger(ClientEcho.class);
+
     @OnOpen
     public void onOpen(Session session){
         try {
 //            InetAddress me = InetAddress.getLocalHost();
 //            String dottedSquad = me.getHostAddress();
 //            session.getBasicRemote().sendText(dottedSquad);
+            this.session = session;
             fos = new FileOutputStream(sourcePath.toFile());
         } catch (Exception e){
             e.printStackTrace();
@@ -33,8 +42,6 @@ public class ClientEcho {
     @OnMessage
     public void onMessage(ByteBuffer message, boolean isLast){
         try {
-//            int idx = 1;
-            //Save the received file to disk
             byte[] data = new byte[message.remaining()];
 //            System.out.println("Received : " + strIdx + " " + message.remaining());
             message.get(data);
@@ -42,20 +49,29 @@ public class ClientEcho {
             fos.write(data);
 
             if(isLast){
-                System.out.println("File received!");
+                logger.info("File received");
                 fos.close();
             }
         } catch (Exception e) {
+            logger.error("error occured during receiving file");
             e.printStackTrace();
         }
     }
 
     @OnMessage
-    public void renameFile(String fileName){
-        Path targetPath = Paths.get(fileName);
+    public void handleJSON(String json){
+        ObjectMapper mapper = new ObjectMapper();
         try{
+            UserFile userFile = mapper.readValue(json, UserFile.class);
+            Path targetPath = Paths.get(userFile.getFilePath());
+            
             Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e){
+
+            this.aclSetter = new Acl();
+            this.aclSetter.setRwxAcl(targetPath, userFile.getUser());
+            logger.info("ACL set");
+        } catch(Exception e){
+            logger.info("error occured during setting ACL");
             e.printStackTrace();
         }
     }
